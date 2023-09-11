@@ -1,0 +1,10 @@
+{% extends 'base_applicant.html' %}
+{% block title %}Profile{% endblock %}
+{% block content %}
+<a href="{% url 'applicant logout' %}" class='btn btn-info' >Log Out</a>
+<form class="form" action="{% url 'applicant profile' %}" method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type='submit' value='Update Profile'>
+</form>
+{% endblock %}

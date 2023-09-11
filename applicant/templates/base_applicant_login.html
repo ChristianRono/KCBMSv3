@@ -1,0 +1,16 @@
+{% extends 'base_applicant.html' %}
+{% block title %}Log In{% endblock %}
+{% block content %}
+<form class="form" action="{% url 'applicant login' %}" method="POST">
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value='Log In'>
+</form>
+{% endblock %}
