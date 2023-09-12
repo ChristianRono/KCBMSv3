@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase,Client
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 from applicant.models import Profile,Sibling,Application
@@ -64,13 +64,23 @@ class ProfileTest(TestCase):
 
     def test_invalid_registration_form(self):
         data = {
-            'username':'test',
+            'username':'',
             'email':'kiprotichchristian@gmail.com',
             'password1':'',
             'password2':'chriswayne'
             }
         form = RegistrationForm(data=data)
         self.assertFalse(form.is_valid())
+
+    def test_login_view(self):
+        KCBMSUser.objects.create_user(
+            username='babu',
+            password='chriswayne'
+        )
+        client = Client()
+        response = client.login(username='babu',password='chriswayne')
+        self.assertTrue(response)
+
 
 
 class SiblingTest(TestCase):

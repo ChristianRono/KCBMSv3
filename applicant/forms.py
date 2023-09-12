@@ -9,7 +9,7 @@ class LoginForm(forms.Form):
 
 class RegistrationForm(forms.Form):
     username = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'id': 'username', 'placeholder': 'Enter Your Username'}))
-    username = forms.EmailField(max_length=20, widget=forms.EmailInput(attrs={'id': 'email', 'placeholder': 'Enter Your Email'}))
+    email = forms.EmailField(max_length=20, widget=forms.EmailInput(attrs={'id': 'email', 'placeholder': 'Enter Your Email'}))
     password1 = forms.CharField(max_length=20, widget=forms.PasswordInput(attrs={'id': 'password1', 'placeholder': 'Enter Your Password'}))
     password2 = forms.CharField(max_length=20, widget=forms.PasswordInput(attrs={'id': 'password2', 'placeholder': 'Confirm Your Password'}))
 
@@ -19,10 +19,6 @@ class ApplicationForm(ModelForm):
         fields = [
             "fee_balance",
             "fee_statement",
-            "is_awarded",
-            "is_active",
-            "reasons",
-            "amount",
             "previous_term_report",
         ]
 

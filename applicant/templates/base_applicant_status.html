@@ -9,9 +9,13 @@
 </ul>
 {% endif %}
 <a href="{% url 'applicant logout' %}" class='btn btn-info' >Log Out</a>
-<form class="form" action="{% url 'applicant homepage' %}" method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value='Apply'>
-</form>
+{% if application.is_active %}
+<p>Your application is still being <span style="color:blue">processed</span></p>
+{% else %}
+{% if application.is_awarded %}
+<p>Your application has been <span style="color:green">awarded</span></p>
+{% else %}
+<p>Your application has been <span style="color:red">declined</span></p>
+{% endif %}
+{% endif %}
 {% endblock %}

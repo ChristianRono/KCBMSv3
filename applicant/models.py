@@ -52,10 +52,10 @@ class Application(models.Model):
     fee_balance = models.IntegerField()
     fee_statement = models.FileField()
     previous_term_report = models.FileField()
-    is_awarded = models.BooleanField()
-    is_active = models.BooleanField()
+    is_awarded = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     reasons = models.TextField(blank=True)
-    amount = models.IntegerField()
+    amount = models.IntegerField(default=0)
     financial_year = models.ForeignKey(FinancialYear,on_delete=models.CASCADE)
 
     def __str__(self):
