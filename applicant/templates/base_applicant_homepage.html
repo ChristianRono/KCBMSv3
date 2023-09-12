@@ -9,7 +9,7 @@
 </ul>
 {% endif %}
 <a href="{% url 'applicant logout' %}" class='btn btn-info' >Log Out</a>
-<form class="form" action="{% url 'applicant homepage' %}" method="POST">
+<form class="form" enctype="multipart/form-data" action="{% url 'applicant homepage' %}" method="POST">
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value='Apply'>

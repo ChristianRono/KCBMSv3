@@ -88,9 +88,11 @@ class HomePageView(LoginRequiredMixin,View):
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(self.request.POST,self.request.FILES)
+        print(self.request.FILES)
 
         if form.is_valid():
-            profile = Profile.objects.get(user__username = request.user)
+            print('h')
+            profile = Profile.objects.get(user__username = self.request.user)
             fee_balance = form.cleaned_data['fee_balance']
             fee_statement = form.cleaned_data['fee_statement']
             previous_term_report = form.cleaned_data['previous_term_report']
@@ -128,8 +130,9 @@ class ProfileView(LoginRequiredMixin,View):
         form = self.form_class(self.request.POST,self.request.FILES)
 
         if form.is_valid():
+            print(self.request.user)
             profile = Profile.objects.create(
-                user = request.user,
+                user = KCBMSUser.objects.get(username=self.request.user),
                 first_name = form.cleaned_data['first_name'],
                 last_name = form.cleaned_data['last_name'],
                 admission_number = form.cleaned_data['admission_number'],
@@ -157,14 +160,17 @@ class ProfileView(LoginRequiredMixin,View):
         else:
             return redirect('applicant homepage')
 
-class StatusView(View):
+class StatusView(LoginRequiredMixin,View):
     template_name = 'base_applicant_status.html'
 
     def get(self, request, *args, **kwargs):
-        application = Application.objects.get(
-            profile = Profile.objects.get(user__username = request.user),
-            financial_year = Financial.objects.get(is_active=True)
-        )
+        try:
+            application = Application.objects.get(
+                profile = Profile.objects.get(user__username = request.user),
+                financial_year = FinancialYear.objects.get(is_active=True)
+            )
+        except ObjectDoesNotExist:
+            return redirect('applicant homepage')
 
         return render(self.request,self.template_name,{'application':application})
 

@@ -59,4 +59,4 @@ class Application(models.Model):
     financial_year = models.ForeignKey(FinancialYear,on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.profile.user.first_name} {self.financial_year.name}"
+        return f"{self.profile.user.username} {self.financial_year.name}"

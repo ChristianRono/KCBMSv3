@@ -127,4 +127,4 @@ class ApplicationTest(TestCase):
     def test_application_creation(self):
         application = self.create_application()
         self.assertTrue(isinstance(application,Application))
-        self.assertEqual(application.__str__(),f"{application.profile.user.first_name} {application.financial_year.name}")
+        self.assertEqual(application.__str__(),f"{application.profile.user.username} {application.financial_year.name}")
