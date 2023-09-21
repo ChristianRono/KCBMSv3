@@ -12,6 +12,12 @@ class Profile(models.Model):
     parents_phone = models.CharField(max_length=15)
     parents_id = models.FileField()
     school_name = models.CharField(max_length=100)
+    SCHOOL_TYPE_CHOICES = (
+        ('primary','Primary School'),
+        ('secondary','Secondary School'),
+        ('tertiary','Tertiary School'),
+    )
+    school_type = models.CharField(max_length=100,choices=SCHOOL_TYPE_CHOICES)
     bank_name = models.CharField(max_length=100)
     bank_account = models.CharField(max_length=100)
     bank_branch = models.CharField(max_length=100)

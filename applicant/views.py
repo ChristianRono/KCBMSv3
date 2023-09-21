@@ -24,14 +24,12 @@ class RegistrationView(View):
         form = self.form_class(self.request.POST)
 
         if form.is_valid():
-            print("valid")
             username = form.cleaned_data['username']
             email = form.cleaned_data['email']
             password1 = form.cleaned_data['password1']
             password2 = form.cleaned_data['password2']
 
             if password1 == password2:
-                print('passwords match')
                 user = KCBMSUser.objects.create_user(
                     username = username,
                     email = email,
@@ -91,7 +89,6 @@ class HomePageView(LoginRequiredMixin,View):
         print(self.request.FILES)
 
         if form.is_valid():
-            print('h')
             profile = Profile.objects.get(user__username = self.request.user)
             fee_balance = form.cleaned_data['fee_balance']
             fee_statement = form.cleaned_data['fee_statement']
