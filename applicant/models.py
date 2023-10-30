@@ -7,6 +7,11 @@ class Profile(models.Model):
     user = models.OneToOneField(KCBMSUser,on_delete=models.CASCADE)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
+    GENDER_CHOICES = (
+        ('male','Male'),
+        ('female','Female')
+    )
+    gender = models.CharField(max_length=20,choices=GENDER_CHOICES)
     admission_number = models.CharField(max_length=100)
     parents_name = models.CharField(max_length=100)
     parents_phone = models.CharField(max_length=15)

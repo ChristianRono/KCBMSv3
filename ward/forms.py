@@ -11,4 +11,5 @@ class WardAdminForm(ModelForm):
     
     class Meta:
         model =  Application
-        fields = ('is_active','reasons','amount')
+        fields = ('id','is_awarded','reasons','amount')
+

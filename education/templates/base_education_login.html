@@ -1,7 +1,7 @@
-{% extends 'base_ward.html' %}
+{% extends 'base_education.html' %}
 {% block title %}Log In{% endblock %}
 {% block content %}
-<form class="form" action="{% url 'ward login' %}" method="POST">
+<form class="form" action="{% url 'education login' %}" method="POST">
     {% csrf_token %}
     {% if messages %}
     <ul class="messages">
@@ -10,7 +10,6 @@
         {% endfor %}
     </ul>
     {% endif %}
-    {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value='Log In'>
 </form>

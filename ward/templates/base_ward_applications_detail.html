@@ -16,10 +16,10 @@
     Guardian's ID: {{application.profile.parents_id  }}</br>
     Family Status: {{ application.profile.get_family_status_display }}</br>
     {% if application.profile.death_cert_father %}</br>
-    Father's Death Certificate: {{ pplication.profile.death_cert_father }}</br>
+    Father's Death Certificate: {{ application.profile.death_cert_father }}</br>
     {% endif %}
     {% if application.profile.death_cert_mother %}
-    Mother's Death Certificate: {{ pplication.profile.death_cert_mother }}</br>
+    Mother's Death Certificate: {{ application.profile.death_cert_mother }}</br>
     {% endif %}
     Family Income: {{ application.profile.family_income }}</br>
 </p>
@@ -48,7 +48,7 @@
 </p>
 <h3>Ward Admin's Section</h3>
 <h4>If approved, enter amount</h4>
-<form class='form' action="/ward/applicant/{{ applicant.id }}/" method="POST">
+<form class='form' action="/ward/applicants/review/{{ application.id }}/" method="POST">
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="Send">
