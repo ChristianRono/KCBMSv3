@@ -23,13 +23,13 @@
 <form class="form" action="{% url 'education login' %}" method="POST">
     {% csrf_token %}
     {% if messages %}
-    <ul class="messages">
+    <div class="messages">
         {% for message in messages %}
-        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        <p {% if message.tags != 'error' %} class="alert alert-{{ message.tags }}"{% else %} class="alert alert-danger" {% endif %}>{{ message }}</li>
         {% endfor %}
-    </ul>
+    </div>
     {% endif %}
     {{ form.as_p }}
-    <input type="submit" value='Log In'>
+    <input class="btn btn-info" type="submit" value='Log In'>
 </form>
 {% endblock %}
