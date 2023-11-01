@@ -1,21 +1,39 @@
 {% extends 'base_applicant.html' %}
 {% block title %}Status{% endblock %}
 {% block content %}
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-<a href="{% url 'applicant logout' %}" class='btn btn-info' >Log Out</a>
-{% if application.is_active %}
-<p>Your application is still being <span style="color:blue">processed</span></p>
-{% else %}
-{% if application.is_awarded %}
-<p>Your application has been <span style="color:green">awarded</span></p>
-{% else %}
-<p>Your application has been <span style="color:red">declined</span></p>
-{% endif %}
-{% endif %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">Kericho County Bursary Management System</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+            <a class="nav-link" href="{% url 'applicant profile' %}">Profile</a>
+            <a class="nav-link" href="{% url 'applicant status' %}">Status</a>
+            <a class="nav-link" href="{% url 'applicant logout' %}">Log Out</a>
+        </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <h3>Your Application Status</h3>
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <p{% if message.tags != 'error' %} class="alert alert-{{ message.tags }}"{% else %} class="alert alert-danger" {% endif %}>{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% if application.is_active %}
+    <p>Your application is still being <span style="color:blue">processed</span></p>
+    {% else %}
+    {% if application.is_awarded %}
+    <p>Your application has been <span style="color:green">awarded</span></p>
+    {% else %}
+    <p>Your application has been <span style="color:red">declined</span></p>
+    {% endif %}
+    {% endif %}
+</div>
 {% endblock %}

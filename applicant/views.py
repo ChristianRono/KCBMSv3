@@ -81,12 +81,11 @@ class HomePageView(LoginRequiredMixin,View):
             form = self.form_class()
             return render(request,self.template_name,{'form':form})
         except ObjectDoesNotExist:
-            messages.error(self.request,'You have to fill out your profile first!')
+            messages.error(request,'You have to fill out your profile first!')
             return redirect('applicant profile')
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(self.request.POST,self.request.FILES)
-        print(self.request.FILES)
 
         if form.is_valid():
             profile = Profile.objects.get(user__username = self.request.user)
