@@ -1,56 +1,74 @@
 {% extends 'base_ward.html' %}
 {% block title %}Application{% endblock %}
 {% block content %}
-<h2>Application Detail View</h2>
-<h3>Personal Detail</h3>
-<p>
-    First Name: {{ application.profile.first_name }}</br>
-    Last Name: {{ application.profile.last_name }}</br>
-    Disability: {% if application.profile.disability_status %} PLWD {% else %} None {% endif %}</br>
-    Applied Bursary Before: {{ application.profile.applied_bursary_before }}</br>
-</p>
-<h3>Family Details</h3>
-<p>
-    Guardian's Name: {{ application.profile.parents_name }}</br>
-    Guardian's Phone Number: {{ application.profile.parents_phone }}</br>
-    Guardian's ID: {{application.profile.parents_id  }}</br>
-    Family Status: {{ application.profile.get_family_status_display }}</br>
-    {% if application.profile.death_cert_father %}</br>
-    Father's Death Certificate: {{ application.profile.death_cert_father }}</br>
-    {% endif %}
-    {% if application.profile.death_cert_mother %}
-    Mother's Death Certificate: {{ application.profile.death_cert_mother }}</br>
-    {% endif %}
-    Family Income: {{ application.profile.family_income }}</br>
-</p>
-<h4>Siblings</h4>
-<table>
-    <tr>
-        <th>Name</th>
-        <th>Institution</th>
-        <th>Year of Study</th>
-        <th>Annual Fees</th>
-        <th>Fees Paid</th>
-        <th>Arreas</th>
-    </tr>
-</table>
-<h3>School Details</h3>
-<p>
-    School: {{ application.profile.school_name }}</br>
-    Admission Number: {{ application.profile.admission_number }}</br>
-    Course: {{ application.profile.course }}</br>
-    Year of Study: {{ application.profile.year_of_study }}</br>
-    Year of Completion: {{ application.profile.year_of_completion }}</br>
-    Annual School Fees: {{ application.profile.annual_school_fees }}</br>
-    Fee Balance: {{ application.fee_balance }}</br>
-    Fee Statement: {{ application.fee_statement }}</br>
-    Previous Term Report: {{ application.previous_term_report }}</br>
-</p>
-<h3>Ward Admin's Section</h3>
-<h4>If approved, enter amount</h4>
-<form class='form' action="/ward/applicants/review/{{ application.id }}/" method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Send">
-</form>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Kericho County Bursary Management System</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+            <a class="nav-link" href="{% url 'ward homepage'%}">Home</a>
+            <a class="nav-link" href="{% url 'ward applicant list'%}">Applications</a>
+            <a class="nav-link" href="{% url 'ward logout' %}">Logout</a>
+        </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <h2>Application Detail View</h2>
+    <h3>Personal Detail</h3>
+    <p>
+        First Name: {{ application.profile.first_name }}</br>
+        Last Name: {{ application.profile.last_name }}</br>
+        Disability: {% if application.profile.disability_status %} PLWD {% else %} None {% endif %}</br>
+        Applied Bursary Before: {{ application.profile.applied_bursary_before }}</br>
+    </p>
+    <h3>Family Details</h3>
+    <p>
+        Guardian's Name: {{ application.profile.parents_name }}</br>
+        Guardian's Phone Number: {{ application.profile.parents_phone }}</br>
+        Guardian's ID: {{application.profile.parents_id  }}</br>
+        Family Status: {{ application.profile.get_family_status_display }}</br>
+        {% if application.profile.death_cert_father %}</br>
+        Father's Death Certificate: {{ application.profile.death_cert_father }}</br>
+        {% endif %}
+        {% if application.profile.death_cert_mother %}
+        Mother's Death Certificate: {{ application.profile.death_cert_mother }}</br>
+        {% endif %}
+        Family Income: {{ application.profile.family_income }}</br>
+    </p>
+    <h4>Siblings</h4>
+    <table class="table">
+        <tr>
+            <th>Name</th>
+            <th>Institution</th>
+            <th>Year of Study</th>
+            <th>Annual Fees</th>
+            <th>Fees Paid</th>
+            <th>Arreas</th>
+        </tr>
+    </table>
+    <h3>School Details</h3>
+    <p>
+        School: {{ application.profile.school_name }}</br>
+        Admission Number: {{ application.profile.admission_number }}</br>
+        Course: {{ application.profile.course }}</br>
+        Year of Study: {{ application.profile.year_of_study }}</br>
+        Year of Completion: {{ application.profile.year_of_completion }}</br>
+        Annual School Fees: {{ application.profile.annual_school_fees }}</br>
+        Fee Balance: {{ application.fee_balance }}</br>
+        Fee Statement: {{ application.fee_statement }}</br>
+        Previous Term Report: {{ application.previous_term_report }}</br>
+    </p>
+    <h3>Ward Admin's Section</h3>
+    <h4>If approved, enter amount</h4>
+    <form class='form' action="/ward/applicants/review/{{ application.id }}/" method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input class="btn btn-info" type="submit" value="Send">
+    </form>
+</div>
 {% endblock %}
