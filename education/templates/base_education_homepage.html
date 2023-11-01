@@ -1,6 +1,25 @@
 {% extends 'base_education.html' %}
 {% block title %}HomePage{% endblock %}
 {% block content %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'education homepage' %}">Kericho County Bursary Management System</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+            <a class="nav-link" href="{% url 'education homepage'%}">Home</a>
+            <a class="nav-link" href="{% url 'education applications' %}">Applications</a>
+            <a class="nav-link" href="{% url 'education users' %}">Users</a>
+            <a class="nav-link" href="{% url 'education financial' %}">Financial Years</a>
+            <a class="nav-link" href="{% url 'education allocations' %}">Allocations</a>
+            <a class="nav-link" href="/education/logout/">Log Out</a>
+        </div>
+        </div>
+    </div>
+    </nav>
+    
 <div class="container">
     <h3>Admin Dashboard</h3>
     <h4>All Application</h4>

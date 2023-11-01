@@ -1,4 +1,6 @@
-from django.shortcuts import render,redirect
+import pandas as pd
+
+from django.shortcuts import render,redirect,HttpResponse
 from django.views import View
 from django.views.generic import ListView,DetailView
 from django.shortcuts import get_object_or_404
@@ -7,11 +9,15 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import logout_then_login
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator
+from django.db.models import Q,Count
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.decorators import login_required
 
 
 from applicant.models import Application,Profile
-from education.models import KCBMSUser,FinancialYear,Ward
-from education.forms import LoginForm
+from education.models import KCBMSUser,FinancialYear,Ward,WardAllocation
+from education.forms import LoginForm,AllocationForm,FinancialForm,UserForm
 
 # Create your views here.
 class LoginView(View):
@@ -130,3 +136,244 @@ class HomePageView(LoginRequiredMixin,View):
                                                     "current_females":current_females,
                                                     "current_males_percentage":current_males_percentage,
                                                     "current_females_percentage":current_females_percentage})
+
+@login_required(login_url='/education/login/')
+def applications(request):
+    financialyear = FinancialYear.objects.get(is_active=True)
+    schools = Profile.objects.values_list('school_name', flat=True).distinct()
+    banks = Profile.objects.values_list('bank_name', flat=True).distinct()
+    wards = Profile.objects.values_list('ward__name', flat=True).distinct()
+    applications = Application.objects.filter(financial_year=financialyear).order_by('profile__first_name')
+    paginator = Paginator(applications,10)
+    page = request.GET.get('page')
+    applications = paginator.get_page(page)
+    count = Application.objects.filter(financial_year=financialyear).count()
+
+    return render(request,"base_education_applications.html",{'applications':applications, 
+                                                  'schools':schools, 
+                                                  'wards':wards,
+                                                  'banks':banks,
+                                                  'count':count})
+
+@login_required(login_url='/education/login/')
+def allocations(request):
+    allocations = WardAllocation.objects.all()
+    return render(request,"base_education_allocations.html",{"allocations":allocations})
+
+@login_required(login_url='/education/login/')
+def allocations_new(request):
+    if request.method == 'POST':
+        form = AllocationForm(request.POST)
+        if form.is_valid():
+            ward = form.cleaned_data['ward']
+            financial_year = form.cleaned_data['financial_year']
+            amount = form.cleaned_data['amount']
+            allocation = WardAllocation.objects.create(ward=ward,financial_year=financial_year,amount=amount)
+            allocation.save()
+            return redirect('education allocations')
+    else:
+        form = AllocationForm()
+        return render(request,"base_education_allocations_form.html",{'form':form})
+
+@login_required(login_url='/education/login/')
+def list_filter(request):
+    query = Q(financial_year__is_active=True)
+    filter_q = 'Financial Year: Current'
+    if 'school-checkbox' in request.POST:
+        filter_q += ' & School:' + request.POST['school-dropdown']
+        query = query & Q(profile__school_name=request.POST['school-dropdown'])
+    if 'gender-checkbox' in request.POST:
+        gender = "Male" if request.POST['gender-dropdown'] == 'm' else "Female"
+        filter_q += ' & Gender:' + gender
+        query = query & Q(profile__gender=request.POST['gender-dropdown'])
+    if 'bank-checkbox' in request.POST:
+        filter_q += ' & Bank:' + request.POST['bank-dropdown']
+        query = query & Q(profile__bank_name=request.POST['bank-dropdown'])
+    if 'ward-checkbox' in request.POST:
+        filter_q += ' & Ward:' + request.POST['ward-dropdown']
+        query = query & Q(profile__ward__name=request.POST['ward-dropdown'])
+    
+    applications = Application.objects.filter(query)
+
+    paginator = Paginator(applications,10)
+    page = request.GET.get('page')
+    applications = paginator.get_page(page)
+    return render(request,"base_education_applications_filter.html",{
+        "applications":applications,
+        "filter":filter_q})
+
+@login_required(login_url='/education/login/')
+def users(request):
+    edu_admin_users = KCBMSUser.objects.filter(is_edu_admin=True)
+    accountant_users = KCBMSUser.objects.filter(is_accountant=True)
+    ward_admin_users = KCBMSUser.objects.filter(is_ward_admin=True)
+    return render(request,"base_education_users.html",{
+        "edu_admin_users":edu_admin_users,
+        "accountant_users":accountant_users,
+        "ward_admin_users":ward_admin_users})
+
+@login_required(login_url='/education/login')
+def edit_users(request,id):
+    if request.method == 'POST':
+        form = UserForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            is_ward_admin = form.cleaned_data['is_ward_admin']
+            is_edu_admin = form.cleaned_data['is_edu_admin']
+            is_accountant = form.cleaned_data['is_accountant']
+
+            user = KCBMSUser.objects.create(
+                username = username,
+                password = make_password(password),
+                is_ward_admin = is_ward_admin,
+                is_edu_admin = is_edu_admin,
+                is_accountant = is_accountant
+            )
+            user.save()
+            return redirect('education users')
+        else:
+            return redirect(f'/education/users/edit/{id}/')
+    else:
+        instance = KCBMSUser.objects.get(id=id)
+        form = UserForm(instance=instance)
+        return render(request,'base_education_users_edit.html',{"form":form,'id':id})
+
+
+@login_required(login_url='/education/login/')
+def activate_user(request,id):
+    user = KCBMSUser.objects.get(id=id)
+    user.is_active = True
+    user.save()
+    return redirect('education users')
+
+@login_required(login_url='/education/login/')
+def deactivate_user(request,id):
+    user = KCBMSUser.objects.get(id=id)
+    user.is_active = False
+    user.save()
+    return redirect('education users')
+
+@login_required(login_url='/education/login/')
+def add_users(request):
+    if request.method == 'POST':
+        form = UserForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            is_ward_admin = form.cleaned_data['is_ward_admin']
+            is_edu_admin = form.cleaned_data['is_edu_admin']
+            is_accountant = form.cleaned_data['is_accountant']
+
+            user = KCBMSUser.objects.create(
+                username = username,
+                password = make_password(password),
+                is_ward_admin = is_ward_admin,
+                is_edu_admin = is_edu_admin,
+                is_accountant = is_accountant
+            )
+            user.save()
+            return redirect('edcation users')
+        else:
+            return redirect('education users add')
+    else:
+        form = UserForm()
+        return render(request,'base_education_users_add.html',{"form":form})
+
+@login_required(login_url='/education/login/')
+def financial(request):
+    financials = FinancialYear.objects.all()
+    return render(request,"base_education_financial.html",{"financials":financials})
+
+@login_required(login_url='/education/login/')
+def financial_new(request):
+    if request.method == 'POST':
+        form = FinancialForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            is_active = form.cleaned_data['is_active']
+            if is_active:
+                financial_year = FinancialYear.objects.get(is_active=True)
+                financial_year.is_active = False
+                financial_year.save()
+                financial_year = FinancialYear.objects.create(name=name,is_active=is_active)
+                financial_year.save()
+            else:
+                financial_year = FinancialYear.objects.create(name=name,is_active=is_active)
+                financial_year.save()
+            return redirect('education financial')
+    else:
+        form = FinancialForm()
+        return render(request,'base_education_financial_form.html',{'form':form})
+
+@login_required(login_url='/education/login/')
+def financial_deactivate(request,id):
+    financial_year = FinancialYear.objects.get(id=id)
+    financial_year.is_active = False
+    financial_year.save()
+    return redirect('education financial')
+
+@login_required(login_url='/education/login/')
+def financial_activate(request,id):
+    try:
+        financial_year = FinancialYear.objects.get(is_active=True)
+        financial_year.is_active = False
+        financial_year.save()
+    except:
+        pass
+    financial_year = FinancialYear.objects.get(id=id)
+    financial_year.is_active = True
+    financial_year.save()
+    return redirect('education financial')
+
+@login_required(login_url='/education/login/')
+def check_applications(request):
+    dups = (
+        Application.objects.values('birth_cert_no')
+        .annotate(count=Count('id'))
+        .values('birth_cert_no')
+        .order_by()
+        .filter(financial_year__is_active=True,count__gt=1)
+    )
+    applications = Application.objects.filter(birth_cert_no__in=dups).order_by('birth_cert_no')
+    if applications.exists():
+        return render(request,'master_applications_check.html',{'applications':applications})
+    else:
+        messages.info(request,'No duplicate Birth Certificates found!')
+        return redirect('master applications')
+    
+
+@login_required(login_url='/education/login/')   
+def print_file(request,filter):
+    filters = filter.split('&')
+    query = Q(financial_year__is_active=True)
+    print(filters)
+    for filter in filters[1:]:
+        parts = filter.split(':')
+        part0 = parts[0].lower().strip()
+        if part0 == 'ward':
+            query = query & Q(ward__name=parts[1])
+        else:
+            if part0 == 'school':
+                part0 = "profile__school_name"
+            if part0 == 'profile__gender':
+                if parts[1] == 'male':
+                    parts[1] = 'male'
+                else:
+                    parts[1] = 'female'
+            query = query & Q((part0,parts[1]))
+        print(query)
+    applications = Application.objects.filter(query)
+    print(applications)
+    applications.select_related('ward','financial_year')
+    applications_list = list(applications.values('profile__first_name',
+                                                 'profile__last_name',
+                                                 'profile__admission_number',
+                                                 'profile__gender',
+                                                 'amount'))
+    year = FinancialYear.objects.get(is_active=True)
+    df = pd.DataFrame(applications_list)
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = f'attachment; filename="{year}-{filter}.xlsx"'
+    df.to_excel(response, index=False)
+    return response

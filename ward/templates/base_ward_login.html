@@ -1,6 +1,25 @@
 {% extends 'base_ward.html' %}
 {% block title %}Log In{% endblock %}
 {% block content %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Kericho County Bursary Management System</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+            <a class="nav-link" href="{% url 'applicant login'%}">Applicant Login</a>
+            <a class="nav-link" href="{% url 'ward login'%}">Ward Admin Login</a>
+            <a class="nav-link" href="{% url 'education login' %}">Education Admin Login</a>
+            <a class="nav-link" href="#">Accounts Login</a>
+        </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <h3>Ward Admin Login</h3>
 <form class="form" action="{% url 'ward login' %}" method="POST">
     {% csrf_token %}
     {% if messages %}

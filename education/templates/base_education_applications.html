@@ -1,0 +1,121 @@
+{% extends 'base_education.html' %}
+{% block title %}Applications{% endblock %}0
+{% block content %}
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'education homepage' %}">Kericho County Bursary Management System</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+            <a class="nav-link" href="{% url 'education homepage'%}">Home</a>
+            <a class="nav-link" href="{% url 'education applications' %}">Applications</a>
+            <a class="nav-link" href="{% url 'education users' %}">Users</a>
+            <a class="nav-link" href="{% url 'education financial' %}">Financial Years</a>
+            <a class="nav-link" href="{% url 'education allocations' %}">Allocations</a>
+            <a class="nav-link" href="/education/logout/">Log Out</a>
+        </div>
+        </div>
+    </div>
+    </nav>
+
+<div class="container">
+    <h3>All Applicants</h3>
+    <form class="form" method="POST" action="{% url 'education applications filter' %}">
+        {% csrf_token %}
+        <input type='checkbox' name='school-checkbox' value='off'> School
+        <select class="disabled" name='school-dropdown'>
+            {% for school in schools %}
+            <option value='{{ school | title }}'>{{ school | upper }}</option>
+            {% endfor %}
+        </select>
+        <input type='checkbox' name='gender-checkbox' value='off'> Gender
+        <select name='gender-dropdown'>
+            <option value='m'>MALE</option>
+            <option value='f'>FEMALE</option>
+        </select>
+        <input type='checkbox' name='ward-checkbox' value='off'> Ward
+        <select name='ward-dropdown'>
+            {% for ward in wards %}
+            <option value='{{ ward | title }}'>{{ ward | upper }}</option>
+            {% endfor %}
+        </select>
+        <input type='checkbox' name='bank-checkbox' value='off'> Bank
+        <select name='bank-dropdown'>
+            {% for bank in banks %}
+            <option value='{{ bank | title }}'>{{ bank | upper }}</option>
+            {% endfor %}
+        </select>
+        <input class="btn btn-info" type="submit" value="Filter">
+    </form>
+    {% if messages %}
+    {% for message in messages %}
+    <div class='alert alert-{{ message.tags }}'>
+        {{ message|safe }}
+    </div>
+    {% endfor %}
+    {% endif %}
+    <table class="table">
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Admission/Registration Number</th>
+            <th>Ward</th>
+            <th>Gender</th>
+            <th>Institution</th>
+            <th>Bank Name</th>
+            <th>Account Number</th>
+            <th>Bank Branch</th>
+            <th>Allocated Amount</th>
+            <th>Status</th>
+        </tr>
+        {% for application in applications %}
+        <tr>
+            <td>{{ application.profile.first_name | title }}</td>
+            <td>{{ application.profile.last_name | title }}</td>
+            <td>{{ application.profile.admission_number | title }}</td>
+            <td>{{ application.profile.ward.name | title }}</td>
+            <td>{{ application.profile.get_gender_display | title }}</td>
+            <td>{{ application.profile.school_name | title }}</td>
+            <td>{{ application.profile.bank_name | title }}</td>
+            <td>{{ application.profile.bank_account | title }}</td>
+            <td>{{ application.profile.bank_branch | title }}</td>
+            <td>{{ application.amount | title }}</td>
+            <td>
+                {% if application.is_active %}
+                <span style='color:blue;'>Processing</span>
+                {% else %}
+                {% if application.is_awarded %}
+                <span style='color:green;'>Awarded</span>
+                {% else %}
+                <span style='color:red;'>Declined</span>
+                {% endif %}
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <span>No Applications as of now!</span>
+        </tr>
+        {% endfor %}
+    </table>
+    <div class="pagination">
+        <span class="step-links">
+        {% if applications.has_previous %}
+        <a href="?page=1">&laquo; first</a>
+        <a href="?page={{ applications.previous_page_number }}">previous</a>
+        {% endif %}
+        <span class="current">
+        Page {{ applications.number }} of {{ applications.paginator.num_pages }}.
+        </span>
+        {% if applications.has_next %}
+        <a href="?page={{ applications.next_page_number }}">next</a>
+        <a href="?page={{ applications.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+        </span>
+        </div>
+    <span><i>{{ count }} Entries<i></span>
+</div>
+{% endblock %}
